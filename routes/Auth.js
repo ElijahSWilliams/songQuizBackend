@@ -5,8 +5,8 @@ require("dotenv").config();
 
 const querystring = require("querystring"); //Node.js module that helps build or parse URL query parameters
 
-const CLIENT_ID = process.env.CLIENT_ID; //set client id
-const REDIRECT_URI = process.env.REDIRECT_URI; //set redirect url=i
+const CLIENT_ID = process.env.clientID; //set client id
+const redirectURI = process.env.redirectURI; //set redirect url=i
 const SCOPES = [
   "user-library-read",
   "user-read-private",
@@ -16,12 +16,12 @@ const SCOPES = [
   "streaming",
 ].join(" "); //set scope and join
 
-router.get("/login", (req, res) => {
+loginRouter.get("/login", (req, res) => {
   const queryParams = querystring.stringify({
     response_type: "code",
     client_id: CLIENT_ID,
     scope: SCOPES,
-    redirect_uri: REDIRECT_URI,
+    redirect_uri: redirectURI,
   });
 
   res.redirect(`https://accounts.spotify.com/authorize?${queryParams}`);
