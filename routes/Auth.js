@@ -1,12 +1,12 @@
-// routes/auth.js
 const express = require("express");
-const loginRouter = express.Router();
+const authRouter = express.Router();
 require("dotenv").config();
+const querystring = require("querystring");
 
-const querystring = require("querystring"); //Node.js module that helps build or parse URL query parameters
+const CLIENT_ID = process.env.clientID;
+const CLIENT_SECRET = process.env.clientSecret;
+const redirectURI = process.env.redirectURI;
 
-const CLIENT_ID = process.env.clientID; //set client id
-const redirectURI = process.env.redirectURI; //set redirect url=i
 const SCOPES = [
   "user-library-read",
   "user-read-private",
@@ -14,9 +14,12 @@ const SCOPES = [
   "user-read-playback-state",
   "user-modify-playback-state",
   "streaming",
-].join(" "); //set scope and join
+].join(" ");
 
-loginRouter.get("/login", (req, res) => {
+//collect user info and send user to Spotifys login screen
+authRouter.get("/login", (req, res) => {
+  //http://localhost:2002/auth/login
+
   const queryParams = querystring.stringify({
     response_type: "code",
     client_id: CLIENT_ID,
@@ -24,7 +27,58 @@ loginRouter.get("/login", (req, res) => {
     redirect_uri: redirectURI,
   });
 
-  res.redirect(`https://accounts.spotify.com/authorize?${queryParams}`);
+  res.redirect(`https://accounts.spotify.com/authorize?${queryParams}`); //send user to Spotify auth page
 });
+//end GET
 
-module.exports = loginRouter;
+/* Spotify sends the user back to /callback endpoint with a code, 
+and then this function sends that code to the frontend
+*/
+authRouter.get("/callback", (req, res) => {
+  const code = req.query.code;
+
+  // Send code to frontend to handle the token exchange
+  res.redirect(`http://localhost:2001/callback?code=${code}`);
+});
+//end GET
+
+/* After the frontend receives the code, it sends it back to the server via this POST /token
+it then exchanges the code with SPotify for the accessToken and the refreshToken
+*/
+authRouter.post("/token", async (req, res) => {
+  console.log("Getting Token");
+  const code = req.body.code;
+
+  try {
+    const response = await fetch("https://accounts.spotify.com/api/token", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+        Authorization:
+          "Basic " +
+          Buffer.from(`${CLIENT_ID}:${CLIENT_SECRET}`).toString("base64"),
+      },
+      body: new URLSearchParams({
+        grant_type: "authorization_code",
+        code,
+        redirect_uri: redirectURI,
+      }),
+    });
+
+    const data = await response.json();
+
+    if (data.access_token) {
+      res.json({
+        access_token: data.access_token,
+        refresh_token: data.refresh_token,
+      });
+    } else {
+      res.status(400).json({ error: "Failed to get tokens", details: data });
+    }
+  } catch (err) {
+    console.error("Token exchange error:", err);
+    res.status(500).json({ error: "Something went wrong" });
+  }
+}); //end POST
+
+module.exports = authRouter;
