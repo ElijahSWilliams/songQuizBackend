@@ -27,4 +27,29 @@ profileRouter.get("/profile", async (req, res) => {
   }
 });
 
+profileRouter.get("/tracks", async (req, res) => {
+  const accessToken = req.headers.authorization?.split(" ")[1];
+
+  if (!accessToken) {
+    return res.status(401).json({ error: "No access token provided" });
+  }
+
+  try {
+    const response = await fetch("https://api.spotify.com/v1/me/tracks", {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch saved tracks");
+    }
+
+    const tracks = await response.json();
+    res.json(tracks);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 module.exports = profileRouter;
