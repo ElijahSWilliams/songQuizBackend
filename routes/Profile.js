@@ -22,7 +22,8 @@ profileRouter.get("/profile", async (req, res) => {
 
     const profile = await response.json();
     res.json(profile);
-  } catch (err) {
+  } catch (err) { 
+    console.error("err:", err)
     res.status(500).json({ error: err.message });
   }
 });
@@ -47,7 +48,8 @@ profileRouter.get("/tracks", async (req, res) => {
 
     const tracks = await response.json();
     res.json(tracks);
-  } catch (err) {
+  } catch (err) { 
+    console.error("err:", err)
     res.status(500).json({ error: err.message });
   }
 });
