@@ -5,7 +5,8 @@ const querystring = require("querystring");
 
 const CLIENT_ID = process.env.clientID;
 const CLIENT_SECRET = process.env.clientSecret;
-const redirectURI = process.env.redirectURI;
+const redirectURI =
+  process.env.redirectURI || "http://localhost:2002/auth/callback";
 
 const SCOPES = [
   "user-library-read",
@@ -38,7 +39,7 @@ authRouter.get("/callback", (req, res) => {
   const code = req.query.code;
 
   // Send code to frontend to handle the token exchange
-  res.redirect(`http://localhost:2001/callback?code=${code}`);
+  res.redirect(`${redirectURI}/callback?code=${code}`);
 });
 //end GET
 
