@@ -21,6 +21,8 @@ const SCOPES = [
 authRouter.get("/login", (req, res) => {
   //http://localhost:2002/auth/login
 
+  console.log(`Redirect URI in login: ${redirectURI}`);
+
   const queryParams = querystring.stringify({
     response_type: "code",
     client_id: CLIENT_ID,
