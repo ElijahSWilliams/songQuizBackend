@@ -27,7 +27,7 @@ authRouter.get("/login", (req, res) => {
     response_type: "code",
     client_id: CLIENT_ID,
     scope: SCOPES,
-    redirect_uri: encodeURIComponent(redirectURI),
+    redirect_uri: redirectURI,
   });
 
   const authURL = `https://accounts.spotify.com/authorize?${queryParams}`;
