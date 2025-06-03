@@ -45,7 +45,7 @@ authRouter.get("/callback", (req, res) => {
   const code = req.query.code;
 
   // Send code to frontend to handle the token exchange
-  res.redirect(`${redirectURI}?code=${code}`);
+  res.redirect(`${redirectURI}#/callback?code=${code}`);
 });
 //end GET
 
