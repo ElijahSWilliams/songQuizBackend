@@ -30,7 +30,11 @@ authRouter.get("/login", (req, res) => {
     redirect_uri: redirectURI,
   });
 
-  res.redirect(`https://accounts.spotify.com/authorize?${queryParams}`); //send user to Spotify auth page
+  const authURL = `https://accounts.spotify.com/authorize?${queryParams}`;
+
+  console.log("Redirecting to Spotify with URL:", authURL);
+
+  res.redirect(authURL); //send user to Spotify auth page
 });
 //end GET
 
@@ -41,7 +45,7 @@ authRouter.get("/callback", (req, res) => {
   const code = req.query.code;
 
   // Send code to frontend to handle the token exchange
-  res.redirect(`${redirectURI}#/callback?code=${code}`);
+  res.redirect(`${redirectURI}?code=${code}`);
 });
 //end GET
 
