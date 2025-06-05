@@ -5,8 +5,13 @@ const querystring = require("querystring");
 
 const CLIENT_ID = process.env.clientID;
 const CLIENT_SECRET = process.env.clientSecret;
-const redirectURI =
-  process.env.redirectURI || "http://localhost:2002/auth/callback";
+const isProd = process.env.NODE_ENV === "production";
+
+const redirectURI = isProd
+  ? "https://elijahswilliams.github.io/SongQUIZ/"
+  : "http://localhost:2001/SongQUIZ/";
+
+console.log("URI:", redirectURI, "ISPROD", isProd);
 
 const SCOPES = [
   "user-library-read",
@@ -44,6 +49,7 @@ and then this function sends that code to the frontend
 authRouter.get("/callback", (req, res) => {
   const code = req.query.code;
 
+  console.log(redirectURI);
   // Send code to frontend to handle the token exchange
   res.redirect(`${redirectURI}#/callback?code=${code}`);
 });
@@ -83,9 +89,4 @@ authRouter.post("/token", async (req, res) => {
       res.status(400).json({ error: "Failed to get tokens", details: data });
     }
   } catch (err) {
-    console.error("Token exchange error:", err);
-    res.status(500).json({ error: "Something went wrong" });
-  }
-}); //end POST
-
-module.exports = authRouter;
+    console.error("Toke
